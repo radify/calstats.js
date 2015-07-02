@@ -163,8 +163,8 @@ Now build the project by running:
 gulp
 ```
 
-This will create build/icalstats.js, which is the file that other projects should use.
+This will create `/icalstats.js`, which is the file that other projects should use, as specified in `package.json`.
 
-Note the directory "spec" which contains the unit tests for this library.
+Note the directory `spec` which contains the unit tests for this library.
 
 If you would like to submit code, feel free to create a pull request.
