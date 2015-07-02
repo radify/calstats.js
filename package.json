@@ -2,7 +2,6 @@
   "name": "ical-stats",
   "version": "1.0.0",
   "description": "Time tracking and stats for Google Calendar",
-  "main": "index.js",
   "dependencies": {
     "ical": "^0.4.0",
     "lodash": "^3.8.0"
@@ -17,11 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://radify.github.io/radify/google-cal-stats"
+    "url": "https://github.com/radify/icalstats.js"
   },
   "keywords": [
     "google",
     "calendar",
+    "ical",
     "time",
     "tracking",
     "stats"
