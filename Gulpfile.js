@@ -45,17 +45,14 @@ gulp.task('quality', ['test', 'lint']);
 
 // The build task - relies on 'clean' and 'quality' and 'styles
 gulp.task('build', ['clean', 'quality'], function() {
-  gulp.src('src/**/*')
+  gulp.src('src/icalstats.js')
     .pipe(uglify())
-    .pipe(gulp.dest('build'));
-
-  gulp.src(['node_modules/ical/**/*']).pipe(gulp.dest('build/node_modules/ical'));
-  gulp.src(['node_modules/lodash/**/*']).pipe(gulp.dest('build/node_modules/lodash'));
+    .pipe(gulp.dest('./'));
 });
 
 // On change to JavaScript files, run the default task
 gulp.task('dev', function() {
-  gulp.watch(['*.js', 'spec/*.js', 'src/**/*.js'], ['default']);
+  gulp.watch(['spec/*.js', 'src/**/*.js'], ['default']);
 });
 
 // alias watch == dev
