@@ -1,3 +1,5 @@
+[ ![Travis build status](https://travis-ci.org/radify/icalstats.js.svg)](https://travis-ci.org/radify/icalstats)
+
 # icalstats.js
 
 NodeJS tool that can interpret an ical feed (e.g. from Google Calendar) and output statistics by parsing [tags]. Provides:
