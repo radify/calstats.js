@@ -51,7 +51,7 @@ gulp.task('build', ['clean', 'quality'], function() {
 });
 
 // On change to JavaScript files, run the default task
-gulp.task('dev', function() {
+gulp.task('dev', ['default'], function() {
   gulp.watch(['spec/*.js', 'src/**/*.js'], ['default']);
 });
 

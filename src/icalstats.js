@@ -118,21 +118,22 @@
      * @returns {Date} Earliest event
      */
     getEarliest: function() {
-      return _(this.data).sortBy('start').first().start;
+      var earliest = _(this.data).sortBy('start').first();
+      return earliest ? earliest.start : null;
     },
 
     /**
      * @returns {Date} Latest event
      */
     getLatest: function() {
-      return _(this.data).sortBy('start').reverse().first().start;
+      var latest = _(this.data).sortBy('start').reverse().first();
+      return latest ? latest.start : null;
     },
 
     /**
      * @returns {Number} Number of events
      */
     getCount: function() {
-      // console.log(this.data);
       return this.data.length;
     },
 
@@ -140,9 +141,11 @@
      * @returns {Number} Count of hours in the date range
      */
     getTotalHours: function() {
-      return _(this.breakdown).reduce(function(result, n, key) {
+      var total = _(this.breakdown).reduce(function(result, n, key) {
         return result + n;
       });
+
+      return _.isUndefined(total) ? 0 : total;
     }
   };
 

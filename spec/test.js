@@ -100,5 +100,24 @@ describe('iCalStats Library Test Suite:', function() {
         expect(iCalStats.getCount()).toEqual(0);
       });
     });
+
+    describe('getEarliest()', function() {
+      it('returns null', function() {
+        expect(iCalStats.getEarliest()).toEqual(null);
+      });
+    });
+
+    describe('getLatest()', function() {
+      it('returns null', function() {
+        expect(iCalStats.getLatest()).toEqual(null);
+      });
+    });
+
+    describe('getTotalHours()', function(){
+      it('returns 0', function() {
+        expect(iCalStats.getTotalHours()).toEqual(0);
+      });
+
+    });
   });
 });
