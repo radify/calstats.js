@@ -1,4 +1,7 @@
 [ ![Travis build status](https://travis-ci.org/radify/icalstats.js.svg)](https://travis-ci.org/radify/icalstats)
+[ ![npm version](https://badge.fury.io/js/icalstats.svg)](https://www.npmjs.com/package/icalstats)
+[ ![Dependency Status](https://david-dm.org/radify/icalstats.js.svg)](https://david-dm.org/radify/icalstats.js)
+[ ![devDependency Status](https://david-dm.org/radify/icalstats.js/dev-status.svg)](https://david-dm.org/radify/icalstats.js#info=devDependencies)
 
 # icalstats.js
 
