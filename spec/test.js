@@ -35,6 +35,127 @@ describe('iCalStats Library Test Suite:', function() {
     });
   });
 
+  describe('smart tags', function() {
+
+    var tree;
+
+    describe('simple case', function() {
+
+
+      beforeEach(function() {
+        iCalStats.breakdown = {
+          'radify': 1,
+          'radify-labs': 1,
+          'radify-labs-admin': 1,
+          'radify-labs-icalstats': 1,
+          'radify-labs-radiian': 1,
+          'radify-labs-radiian-debugging': 1,
+          'radify-labs-radiian-publishing': 1,
+          'radify-admin': 1,
+          'radify-admin-meeting': 1
+        };
+
+        tree = iCalStats.getTree();
+      });
+
+      it('Creates a tree', function() {
+        expect(tree.radify.admin.value).toEqual(2);
+        expect(tree.radify.admin.meeting.value).toEqual(1);
+      });
+
+      it('summarises at each level', function() {
+        expect(tree.radify.value).toEqual(9);
+        expect(tree.radify.labs.value).toEqual(6);
+        expect(tree.radify.labs.radiian.value).toEqual(3);
+        expect(tree.radify.labs.radiian.debugging.value).toEqual(1);
+      });
+
+      it('supports up to 4 levels', function() {
+        expect(tree.radify.labs.radiian.debugging.value).toEqual(1);
+      });
+    });
+
+    describe('real data', function() {
+      beforeEach(function() {
+        iCalStats.breakdown = {
+          "radify-labs":13,
+          "someclient-messaging":37,
+          "someclient-training":33,
+          "someclient-support":21,
+          "radify-admin":9.5,
+          "radify-labs-denzel":2,
+          "someotherclient-automation":5.5,
+          "someotherclient-development-maildev":10.5,
+          "radify-labs-aws-php-sdk":2,
+          "radify-marketing":13.5,
+          "radify-specification-denzel":1.5,
+          "someclient-demo":1,
+          "radify-research":1.5,
+          "someclient-meeting":10,
+          "someotherclient-devops":4,
+          "client3":0.5,
+          "someclient-mailing-spec":1,
+          "someotherclient-support":30.5,
+          "someclient-mailing":1,
+          "radify-documentation":1.5,
+          "someotherclient-meeting":0.5,
+          "someclient-specification":8.5,
+          "radify-meeting":2.5,
+          "opensource-prospector":1.5,
+          "opensource-radiian":23,
+          "opensource-icalstats":31,
+          "someotherclient":37,
+          "someclient":0.5,
+          "marketing-blog":4,
+          "opensource-honestybox":0.5,
+          "someclient-roadmap":1,
+          "someclient-charts":1.5};
+
+        tree = iCalStats.getTree();
+      });
+
+      it('creates other for nodes that have time directly tracked to a the root rather than subtasks', function() {
+        expect(tree.someclient.mailing.other.value).toEqual(1);
+      })
+
+      it('will not create other for nodes that are fully accounted for', function() {
+        expect(tree.other).toBeUndefined();
+      });
+    });
+
+    describe('smart tags autofilling with "other" for unspecified tasks', function() {
+
+      beforeEach(function() {
+        iCalStats.breakdown = {
+          'radify-labs-radiian': 1,
+          'radify-labs': 1,
+          'radify': 3,
+
+          'client-development-foo-bar': 3,
+          'client-development-foo': 2,
+          'client-development-baz-bip': 1,
+          'client': 42
+        };
+
+        tree = iCalStats.getTree();
+      });
+
+      it('Fills the base value', function() {
+        expect(tree.radify.value).toEqual(5);
+      });
+
+      it('Fills in an other count for unspecified tasks at a given level of the tree', function() {
+        expect(tree.radify.other.value).toEqual(3);
+
+        expect(tree.client.development.foo.other.value).toEqual(2);
+        expect(tree.client.other.value).toEqual(42);
+        expect(tree.client.value).toEqual(48);
+      });
+    });
+
+  });
+
+
   describe('standard data set', function() {
     beforeEach(function() {
       iCalStats.load(fixture, '2015-05-01', '2015-06-05');

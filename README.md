@@ -74,6 +74,32 @@ Once it's ready to rock, you can call the following functions:
   'project-a': 8 }
 ```
 
+* `getTree` - return a tree-type breakdown. Hour counts are available with the `.value` key at any point in the tree. This means that, given input breakdown data like:
+
+```javascript
+{
+    'radify': 1,
+    'radify-labs': 1,
+    'radify-labs-admin': 1,
+    'radify-labs-icalstats': 1,
+    'radify-labs-radiian': 1,
+    'radify-labs-radiian-debugging': 1,
+    'radify-labs-radiian-publishing': 1,
+    'radify-admin': 1,
+    'radify-admin-meeting': 1
+}
+```
+
+icalstats.js can tell you things like:
+
+* 9 hours were spent on all Radify tasks
+* 3 hours were spent on all Radify labs radiian tasks
+* 1 hour was spent on debugging Radify labs radiian
+* 2 hours was spent in total on Radify admin
+* 1 hour was spent in Radify admin meeting, and 1 hour in "radify-admin" (expressed as "other")
+
+This means that your client applications can support 'drilling down' into icalstats.js data sets.
+
 # Example usages
 
 ## Example API
@@ -108,7 +134,8 @@ server.route({
         count: icalstats.getCount(),
         total: icalstats.getTotalHours(),
         breakdown: icalstats.getBreakdown(),
-        highLevelBreakdown: icalstats.getHighLevelBreakdown()
+        highLevelBreakdown: icalstats.getHighLevelBreakdown(),
+        tree: icalstats.getTree()
       });
     });
   }
@@ -127,7 +154,7 @@ var icalstats = require('icalstats');
 var ical = require('ical');
 
 program
-  .version('0.0.2')
+  .version('0.0.3')
   .option('-i, --ical [url]', 'Private ical link from Google Calendar')
   .option('-s, --startDate [startDate]', 'The date to start from, e.g. 2015-05-01')
   .option('-e, --endDate [endDate]', 'The date to start from, e.g. 2015-05-08')
@@ -151,6 +178,9 @@ ical.fromURL(program.ical, {}, function(err, data) {
 
   console.log("\nDetailed breakdown:");
   console.log(icalstats.getBreakdown());
+
+  console.log("\nTree:");
+  console.log(icalstats.getTree());
 });
 ```
 

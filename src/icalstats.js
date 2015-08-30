@@ -102,6 +102,113 @@
     },
 
     /**
+     * Convert the breakdown into a tree
+     *
+     * So, if your breakdown looks like:
+     *
+     * 'radify': 1,
+     * 'radify-labs': 1,
+     * 'radify-labs-admin': 1,
+     * 'radify-labs-icalstats': 1,
+     * 'radify-labs-radiian': 1,
+     * 'radify-labs-radiian-debugging': 1,
+     * 'radify-labs-radiian-publishing': 1,
+     * 'radify-admin': 1,
+     * 'radify-admin-meeting': 1
+     *
+     * This will return:
+     *
+     * { radify:
+     *     { value: 9,
+     *       other: { value: 1 },
+     *       labs:
+     *       { value: 6,
+     *         admin: [Object],
+     *         icalstats: [Object],
+     *         radiian: [Object] },
+     *       admin: { value: 2, meeting: [Object] } } }
+     *
+     * Each key has "value", which allows you to extract the count
+     *
+     * For example, from this data:
+     *
+     * expect(tree.radify.labs.radiian.value).toEqual(3);
+     * expect(tree.radify.labs.radiian.debugging.value).toEqual(1);
+     *
+     * Supports up to 4 levels of depth
+     *
+     * @returns {object} Tree-based representation of this.breakdown
+     */
+    getTree: function() {
+
+      function addOrSet(thing, key, val) {
+        if(thing[key]) {
+          thing[key].value += val;
+        } else {
+          thing[key] = { value: val };
+        }
+      }
+
+      var tree = {};
+      var self = this;
+
+      _(this.breakdown).keys().forEach(function(key) {
+        var keys = key.split('-');
+        var val = self.breakdown[key];
+
+        if (keys.length > 0) {
+          addOrSet(tree, keys[0], val);
+        }
+
+        if (keys.length > 1) {
+          addOrSet(tree[keys[0]], keys[1], val);
+        }
+
+        if (keys.length > 2) {
+          addOrSet(tree[keys[0]][keys[1]], keys[2], val);
+        }
+
+        if (keys.length > 3) {
+          addOrSet(tree[keys[0]][keys[1]][keys[2]], keys[3], val);
+        }
+      }).value();
+
+      // autofill 'other' for when, for example, time is both tracked to foo-bar and foo directly.
+      // this means when it gets displayed you'd get:
+      // foo:     10 hours
+      //   bar:   6  hours
+      //   other: 4  hours
+      //
+      // so, 'other' is kind of a virtual count
+      function autofill(tree) {
+        _(tree)
+          .keys()
+          .without('value', 'other')
+          .forEach(function(key) {
+
+            var sumOfChildren = _(tree[key])
+              .keys()
+              .without('value', 'other')
+              .map(function(k) {
+                return tree[key][k].value;
+              })
+              .sum();
+
+            var otherHours = tree[key].value - sumOfChildren;
+            if (otherHours > 0 && otherHours < tree[key].value) {
+              tree[key].other = { value: otherHours };
+            }
+
+            autofill(tree[key]);
+        }).value();
+      }
+
+      autofill(tree);
+
+      return tree;
+    },
+
+    /**
      * @returns {Object} e.g.
      *
      * { research: 6,
