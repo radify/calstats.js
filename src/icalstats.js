@@ -90,14 +90,22 @@
       this.data = data;
     },
 
+    /**
+     * Get just the high level breakdown of your data
+     *
+     * so if you have a breakdown of:
+     * {
+     *   'radify': 1,
+     *   'radify-labs': 2
+     *   'radify-labs-x': 4
+     * }
+     *
+     * the breakdown will return
+     * { radify: 7 }
+     */
     getHighLevelBreakdown: function() {
-      return _.transform(this.breakdown, function(result, n, key) {
-        var topLevelKey = key.split('-')[0];
-        if (result[topLevelKey]) {
-          result[topLevelKey] += n;
-        } else {
-          result[topLevelKey] = n;
-        }
+      return _.transform(this.getTree(), function(result, n, key) {
+        result[key] = n.value;
       });
     },
 
