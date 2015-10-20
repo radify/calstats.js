@@ -1,6 +1,6 @@
 {
   "name": "icalstats",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Time tracking and stats for Google Calendar",
   "dependencies": {
     "ical": "^0.4.0",
@@ -8,12 +8,12 @@
   },
   "main": "icalstats.js",
   "devDependencies": {
-    "del": "^1.2.1",
+    "del": "^2.0.2",
     "gulp": "^3.9.0",
-    "gulp-istanbul": "^0.10.0",
-    "gulp-jasmine": "^2.0.1",
+    "gulp-istanbul": "^0.10.2",
+    "gulp-jasmine": "^2.1.0",
     "gulp-jshint": "^1.11.2",
-    "gulp-uglify": "^1.2.0"
+    "gulp-uglify": "^1.4.2"
   },
   "repository": {
     "type": "git",
