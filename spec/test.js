@@ -6,6 +6,38 @@ function dateFromUTC() {
   return new Date(utcDate);
 }
 
+describe('handling of untagged elements', function() {
+
+  var fixture;
+
+  // applied before each nested describe()
+  beforeEach(function() {
+    fixture = ical.parseFile('./fixtures/mostly-untagged.ics');
+    iCalStats.load(fixture, '2015-05-01', '2015-06-05');
+  });
+
+  describe('getHighLevelBreakdown()', function() {
+    it('groups untagged elements into an untagged collection', function() {
+      var hlb = iCalStats.getHighLevelBreakdown();
+
+      expect(hlb.untagged).toEqual(18);
+      expect(hlb.project).toEqual(8);
+
+    });
+  });
+
+  describe('getTree()', function() {
+    it('groups all untagged elements into a high level collection', function() {
+      var tree = iCalStats.getTree();
+      expect(tree.untagged.value).toEqual(18);
+      expect(tree.untagged.notags.value).toEqual(6);
+
+      expect(tree.untagged['meeting_and_emails'].value).toEqual(3.5);
+      expect(tree.untagged['sprint_planning'].value).toEqual(4);
+    });
+  });
+});
+
 describe('iCalStats Library Test Suite:', function() {
 
   var fixture;
