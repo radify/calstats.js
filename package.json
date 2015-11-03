@@ -1,6 +1,6 @@
 {
   "name": "icalstats",
-  "version": "1.5.1",
+  "version": "1.6.1",
   "description": "Time tracking and stats for Google Calendar",
   "dependencies": {
     "ical": "^0.4.0",
