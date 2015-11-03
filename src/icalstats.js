@@ -3,22 +3,21 @@
   var _ = require('lodash');
 
   function extractTags(event) {
-    if (!event.summary || event.summary === '') {
-      return ['no-tags'];
+    var summary = event.summary.replace(/ /g, '_');
+    if (!summary || summary === '') {
+      return ['untagged-' + summary];
     }
 
-    var regex = /\[([a-zA-Z\.\s\-]*?)\]/g;
-    var tags = event.summary.match(regex);
+    // get everything that looks like a tag
+    var tags = summary.match(/\[([a-zA-Z0-9\_\.\s\-]*?)\]/g);
 
-    if (!tags || tags.length === 0) {
-      return ['no-tags'];
+    if (_.isEmpty(tags)) {
+      tags = ['untagged-' + summary];
     }
 
-    for (var i = 0; i < tags.length; i++) {
-      tags[i] = tags[i].toLowerCase().replace('[', '').replace(']', '');
-    }
-
-    return tags;
+    return _(tags).map(function(tag) {
+      return tag.toLowerCase().replace('[', '').replace(']', '').replace(/ /g, '_');
+    }).value();
   }
 
   function getLengthInHours(event) {
@@ -64,7 +63,6 @@
           totals[tags[i]] += lengthInHours;
         }
       }
-
 
       function inDateRange(ev) {
         if (ev.start < filterStartDate) {
