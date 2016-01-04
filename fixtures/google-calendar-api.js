@@ -1,0 +1,18 @@
+[ { kind: 'calendar#event',
+    etag: '"1234810321966000"',
+    id: '1234o3160bb67aau0yyuunuxxx',
+    status: 'confirmed',
+    htmlLink: 'https://calendar.google.com/calendar/event?eid=ababababababababababaabbababab82137y48321794571984712987348291739842178974698612945689',
+    created: '2016-01-04T10:59:20.000Z',
+    updated: '2016-01-04T10:59:20.983Z',
+    summary: 'other test event please ignore',
+    creator: { email: 'gavin@radify.io', displayName: 'Gavin Davies' },
+    organizer:
+    { email: 'radify.io_lalalaalalal@group.calendar.google.com',
+        displayName: '[Time tracking] Gavin',
+        self: true },
+    start: { dateTime: '2016-01-04T13:30:00Z' },
+    end: { dateTime: '2016-01-04T14:30:00Z' },
+    iCalUID: 'someidentifier@google.com',
+    sequence: 0,
+    reminders: { useDefault: true } } ];

@@ -3,6 +3,8 @@
   "version": "1.6.1",
   "description": "Time tracking and stats for Google Calendar",
   "dependencies": {
+    "google-auth-library": "^0.9.7",
+    "googleapis": "^2.1.7",
     "ical": "^0.4.0",
     "lodash": "^3.10.1"
   },

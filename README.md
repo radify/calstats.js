@@ -12,6 +12,17 @@ NodeJS tool that can interpret an ical feed (e.g. from Google Calendar) and outp
 * Total time spent
 * Count of events
 
+We provide adapters for:
+
+* Google Calendar via oauth
+* ical formatted feed
+
+## Boundaries
+
+icalstats.js is NOT for:
+
+* Getting data from your calendar API - you do this yourself. icalstats.js just parses that data.
+
 # Installation
 
 ```bash
@@ -142,6 +153,40 @@ server.route({
 });
 ```
 
+# Adapters
+
+icalstats.js comes bundled with adapters to parse:
+
+* `googleapi` - results from the [Google Calendar API events/list call](https://developers.google.com/google-apps/calendar/v3/reference/events/list)
+* `icalfeed` - an icalstats feed as loaded through the [ical library](https://www.npmjs.com/package/ical)
+
+To load an adapter, simply require it and tell icalstats.js to use that adapter:
+
+```javascript
+// load the Google calendar adapter
+var adapter = require('./src/adapters/googleapi');
+
+// ...
+
+// load the data into icalstats using the calendar adapter to normalise the data
+icalstats.load(data, adapter, '2016-01-01', '2016-12-30');
+```
+
+```javascript
+// load the icalstats adapter
+var adapter = require('./src/adapters/icalfeed');
+
+// ...
+
+// load the data into icalstats using the calendar adapter to normalise the data
+icalstats.load(data, adapter, '2016-01-01', '2016-12-30');
+
+...
+
+// load the data into icalstats using the calendar adapter to normalise the data
+icalstats.load(data, adapter, '2016-01-01', '2016-12-30');
+```
+
 ## Example command line client
 
 * [Commander](https://www.npmjs.com/package/commander) - used for a nice CLI interface
@@ -152,6 +197,7 @@ server.route({
 var program = require('commander');
 var icalstats = require('icalstats');
 var ical = require('ical');
+var adapter = require('./src/adapters/icalfeed');
 
 program
   .version('0.0.3')
@@ -167,7 +213,7 @@ if (!process.argv.slice(2).length) {
 program.parse(process.argv);
 
 ical.fromURL(program.ical, {}, function(err, data) {
-  icalstats.load(data, program.startDate, program.endDate);
+  icalstats.load(data, adapter, program.startDate, program.endDate);
 
   console.log("Date range: " + icalstats.getEarliest() + " - " + icalstats.getLatest());
   console.log("count: " + icalstats.getCount() + " events");

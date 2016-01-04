@@ -36,15 +36,16 @@
     breakdown: null,
 
     /**
-     * Take an ical feed, and parse some statistics from it
+     * Take a set of calendar data, and parse some statistics from it
      *
-     * @param data ical data from the ical library
-     * @param startDate string e.g. 2015-01-01
-     * @param endDate string e.g. 2015-10-01
+     * @param {object} data ical data from the ical library
+     * @param {object} adapter
+     * @param {datetime} startDate string e.g. 2015-01-01
+     * @param {datetime} string e.g. 2015-10-01
      */
-    load: function(data, startDate, endDate) {
+    load: function(data, adapter, startDate, endDate) {
+      data = adapter.transform(data);
 
-      // console.log(data);
       var filterStartDate = new Date(startDate);
       var tmp = new Date(endDate);
       var filterEndDate = new Date(endDate);
@@ -247,7 +248,7 @@
      * @returns {Number} Number of events
      */
     getCount: function() {
-      return this.data.length;
+      return this.data && this.data.length ? this.data.length : 0;
     },
 
     /**
