@@ -1,5 +1,6 @@
 var iCalStats = require('../src/icalstats.js');
 var ical = require('ical');
+var icalfeed = require('../src/adapters/icalfeed');
 
 function dateFromUTC() {
   var utcDate = Date.UTC.apply(null, arguments);
@@ -13,7 +14,8 @@ describe('handling of untagged elements', function() {
   // applied before each nested describe()
   beforeEach(function() {
     fixture = ical.parseFile('./fixtures/mostly-untagged.ics');
-    iCalStats.load(fixture, '2015-05-01', '2015-06-05');
+
+    iCalStats.load(fixture, icalfeed, '2015-05-01', '2015-06-05');
   });
 
   describe('getHighLevelBreakdown()', function() {
@@ -184,13 +186,11 @@ describe('iCalStats Library Test Suite:', function() {
         expect(tree.client.value).toEqual(48);
       });
     });
-
   });
-
 
   describe('standard data set', function() {
     beforeEach(function() {
-      iCalStats.load(fixture, '2015-05-01', '2015-06-05');
+      iCalStats.load(fixture, icalfeed, '2015-05-01', '2015-06-05');
     });
 
     describe('Valid date range:', function() {
@@ -237,7 +237,7 @@ describe('iCalStats Library Test Suite:', function() {
     describe('load()', function() {
       it('should throw an exception', function() {
         expect(function() {
-          iCalStats.load(fixture, '2015-10-01', '2015-01-02');
+          iCalStats.load(fixture, icalfeed, '2015-10-01', '2015-01-02');
         }).toThrow('Start date must be before end date');
       });
     });
@@ -245,7 +245,7 @@ describe('iCalStats Library Test Suite:', function() {
 
   describe('date range in which there are no events', function() {
     beforeEach(function() {
-      iCalStats.load(fixture, '2015-01-01', '2015-01-02');
+      iCalStats.load(fixture, icalfeed, '2015-01-01', '2015-01-02');
     });
 
     describe('getCount()', function() {

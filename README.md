@@ -5,23 +5,31 @@
 
 # icalstats.js
 
-NodeJS tool that can interpret an ical feed (e.g. from Google Calendar) and output statistics by parsing [tags]. Provides:
+NodeJS tool that can generate statistics from a calendar by parsing [tags]. Provides:
 
 * Amount of time spent on each client
 * Detailed breakdown of tasks within projects
 * Total time spent
 * Count of events
+* "Tree" of the calendar data
 
-We provide adapters for:
+This library has adapters for:
 
-* Google Calendar via oauth
-* ical formatted feed
+* [/src/adapters/googleapi.js](Google Calendar via oauth)
+* [/src/adapters/icalfeed.js](ical formatted feed), as delivered by the [ical library](https://www.npmjs.com/package/ical)
+
+> Feel free to write your own adapter! See our [contributing guidelines](/CONTRIBUTING.md)
 
 ## Boundaries
 
-icalstats.js is NOT for:
+This tool is for:
 
-* Getting data from your calendar API - you do this yourself. icalstats.js just parses that data.
+* Generating statistics from a calendar
+
+This tools is NOT for:
+
+* Getting the data from your calendar API - you must do this yourself (some examples are below)
+* Entering data into a calendar
 
 # Installation
 
@@ -38,7 +46,7 @@ In your calendar, make sure your entries have "[tags] in their subjects". Tags a
 * "[research] investigating AngularJS plugins"
 * "[project-a] writing new user interface"
 
-Here is an example in Google Calendar:
+Here is an example of using tags in Google Calendar:
 
 ![Google Calendar usage example](/img/usage-example.png)
 
@@ -57,8 +65,14 @@ You then need to run the `load` method, which loads the data into it. You need t
 ```javascript
 var icalstats = require('icalstats');
 var ical = require('ical');
+// load the ical adapter
+var adapter = require('/src/adapters/icalfeed.js');
+
+// use the ical library to grab some raw ical data
 ical.fromURL(someUrl, {}, function(err, data) {
-    icalstats.load(data, startDate, endDate);
+
+    // load the raw ical data into icalstats
+    icalstats.load(data, adapter, startDate, endDate);
 
     // icalstats is now ready to rock!
 });
@@ -66,11 +80,11 @@ ical.fromURL(someUrl, {}, function(err, data) {
 
 Once it's ready to rock, you can call the following functions:
 
-* `getEarliest` - returns the earliest event date that was found in the ical feed within your specified date range
-* `getLatest` - returns the latest event date that was found in the ical feed within your specified date range
-* `getCount` - returns the count of events within your specified date range
-* `getTotalHours` - returns the total number of hours of the events within your specified date range
-* `getHighLevelBreakdown` - returns a breakdown by the top level, for example:
+* `getEarliest()` - returns the earliest event date that was found in the ical feed within your specified date range
+* `getLatest()` - returns the latest event date that was found in the ical feed within your specified date range
+* `getCount()` - returns the count of events within your specified date range
+* `getTotalHours()` - returns the total number of hours of the events within your specified date range
+* `getHighLevelBreakdown()` - returns a breakdown by the top level, for example:
 
 ```javascript
 { research: 6, admin: 3.5, project: 16.5 }
@@ -125,6 +139,8 @@ Here is a simple API that consumes the `icalstats.js` library. It uses:
 var Hapi = require('hapi');
 var icalstats = require('icalstats');
 var ical = require('ical');
+// load the ical adapter
+var adapter = require('/src/adapters/icalfeed.js');
 
 var server = new Hapi.Server();
 server.connection({port: 4730, routes: {cors: true}});
@@ -137,7 +153,7 @@ server.route({
   path: '/',
   handler: function(request, reply) {
     ical.fromURL(request.payload.cal, {}, function(err, data) {
-      icalstats.load(data, request.payload.startDate, request.payload.endDate);
+      icalstats.load(data, adapter, request.payload.startDate, request.payload.endDate);
 
       reply({
         earliest: icalstats.getEarliest(),
@@ -157,8 +173,12 @@ server.route({
 
 icalstats.js comes bundled with adapters to parse:
 
-* `googleapi` - results from the [Google Calendar API events/list call](https://developers.google.com/google-apps/calendar/v3/reference/events/list)
-* `icalfeed` - an icalstats feed as loaded through the [ical library](https://www.npmjs.com/package/ical)
+This library has adapters for:
+
+* [/src/adapters/googleapi.js](Google Calendar via oauth) - results from the [Google Calendar API events/list call](https://developers.google.com/google-apps/calendar/v3/reference/events/list)
+* [/src/adapters/icalfeed.js](ical formatted feed), as delivered by the [ical library](https://www.npmjs.com/package/ical) - an icalstats feed as loaded through the [ical library](https://www.npmjs.com/package/ical)
+
+> Feel free to write your own adapter! See our [contributing guidelines](/CONTRIBUTING.md)
 
 To load an adapter, simply require it and tell icalstats.js to use that adapter:
 
