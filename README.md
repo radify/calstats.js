@@ -43,7 +43,7 @@ You must do these things yourself (some examples are below).
 ## Installation
 
 ```bash
-npm install calstats
+npm install calstats.js
 ```
 
 ## How calstats.js works
