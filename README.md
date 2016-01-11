@@ -1,5 +1,5 @@
 [ ![Travis build status](https://travis-ci.org/radify/calstats.js.svg)](https://travis-ci.org/radify/calstats.js)
-[ ![npm version](https://badge.fury.io/js/calstats.svg)](https://www.npmjs.com/package/calstats.js)
+[ ![npm version](https://badge.fury.io/js/calstats.js.svg)](https://www.npmjs.com/package/calstats.js)
 [ ![Dependency Status](https://david-dm.org/radify/calstats.js.svg)](https://david-dm.org/radify/calstats.js)
 [ ![devDependency Status](https://david-dm.org/radify/calstats.js/dev-status.svg)](https://david-dm.org/radify/calstats.js#info=devDependencies)
 

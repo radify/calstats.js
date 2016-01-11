@@ -1,6 +1,6 @@
 {
   "name": "calstats.js",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "JavaScript tool that can generate statistics for calendars by parsing [tags]",
   "dependencies": {
     "google-auth-library": "^0.9.7",
