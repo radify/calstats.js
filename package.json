@@ -1,6 +1,6 @@
 {
-  "name": "icalstats",
-  "version": "1.6.1",
+  "name": "calstats",
+  "version": "2.0.0",
   "description": "Time tracking and stats for Google Calendar",
   "dependencies": {
     "google-auth-library": "^0.9.7",
@@ -8,18 +8,19 @@
     "ical": "^0.4.0",
     "lodash": "^3.10.1"
   },
-  "main": "icalstats.js",
+  "main": "build/calstats.js",
   "devDependencies": {
     "del": "^2.0.2",
     "gulp": "^3.9.0",
     "gulp-istanbul": "^0.10.2",
     "gulp-jasmine": "^2.1.0",
-    "gulp-jshint": "^1.11.2",
-    "gulp-uglify": "^1.4.2"
+    "gulp-jshint": "^2.0.0",
+    "gulp-uglify": "^1.4.2",
+    "jshint": "^2.9.1-rc2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/radify/icalstats.js"
+    "url": "https://github.com/radify/calstats.js"
   },
   "keywords": [
     "google",

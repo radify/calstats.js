@@ -1,9 +1,9 @@
-[ ![Travis build status](https://travis-ci.org/radify/icalstats.js.svg)](https://travis-ci.org/radify/icalstats)
-[ ![npm version](https://badge.fury.io/js/icalstats.svg)](https://www.npmjs.com/package/icalstats)
-[ ![Dependency Status](https://david-dm.org/radify/icalstats.js.svg)](https://david-dm.org/radify/icalstats.js)
-[ ![devDependency Status](https://david-dm.org/radify/icalstats.js/dev-status.svg)](https://david-dm.org/radify/icalstats.js#info=devDependencies)
+[ ![Travis build status](https://travis-ci.org/radify/calstats.js.svg)](https://travis-ci.org/radify/calstats)
+[ ![npm version](https://badge.fury.io/js/calstats.svg)](https://www.npmjs.com/package/calstats)
+[ ![Dependency Status](https://david-dm.org/radify/calstats.js.svg)](https://david-dm.org/radify/calstats.js)
+[ ![devDependency Status](https://david-dm.org/radify/calstats.js/dev-status.svg)](https://david-dm.org/radify/calstats.js#info=devDependencies)
 
-# icalstats.js
+# calstats.js
 
 NodeJS tool that can generate statistics from a calendar by parsing [tags]. Provides:
 
@@ -15,31 +15,40 @@ NodeJS tool that can generate statistics from a calendar by parsing [tags]. Prov
 
 This library has adapters for:
 
-* [/src/adapters/googleapi.js](Google Calendar via oauth)
-* [/src/adapters/icalfeed.js](ical formatted feed), as delivered by the [ical library](https://www.npmjs.com/package/ical)
+* [/src/adapters/google.js](Google Calendar via oauth)
+* [/src/adapters/ical.js](ical formatted feed), as delivered by the [ical library](https://www.npmjs.com/package/ical)
 
-> Feel free to write your own adapter! See our [contributing guidelines](/CONTRIBUTING.md)
+You can also use your own adapter, provided it matches the interfaces of the adapters above.
+
+> Feel free to write your own adapter and pull request it back to us! See our [contributing guidelines](/CONTRIBUTING.md)
 
 ## Boundaries
 
-This tool is for:
+This diagram shows the boundaries of calstats.js and how it fits into your application:
 
-* Generating statistics from a calendar
+![Boundaries of calstats.js](calstats.js.png "Boundaries of calstats.js")
 
-This tools is NOT for:
+calstats.js is for:
 
-* Getting the data from your calendar API - you must do this yourself (some examples are below)
+* Generating statistics from calendar data
+
+calstats.js is NOT for:
+
+* Getting the data from your calendar API
 * Entering data into a calendar
+* Displaying statistics to the user
 
-# Installation
+You must do these things yourself (some examples are below).
+
+## Installation
 
 ```bash
-npm install icalstats
+npm install calstats
 ```
 
-# How icalstats.js works
+## How calstats.js works
 
-`icalstats.js` parses [tags] out of your ical feed and uses that to create statistics.
+`calstats.js` parses [tags] out of raw calendar data and uses that to create statistics.
 
 In your calendar, make sure your entries have "[tags] in their subjects". Tags are simply square brackets. You create events in your calendar and write something like `[projecta-development]` or `[projecta-research]`. For example:
 
@@ -52,29 +61,31 @@ Here is an example of using tags in Google Calendar:
 
 The first "part" of a tag is used as the top level tag. So, if you have `[projecta-one]` and `[projecta-two]`, this means that the tool can group project a's entries together (exposed using `getHighLevelBreakdown()`) and then allow you to drill down into its details (using `getBreakdown()`).
 
-# API
+## API
 
 Instantiate with:
 
 ```javascript
-var icalstats = require('icalstats');
+var calstats = require('calstats');
 ```
 
-You then need to run the `load` method, which loads the data into it. You need the [ical library](https://www.npmjs.com/package/ical) for this:
+You then need to load data into calstats. It will default to using the ical adapter, which requires the [ical library](https://www.npmjs.com/package/ical). Here is an example:
 
 ```javascript
-var icalstats = require('icalstats');
+var calstats = require('calstats');
 var ical = require('ical');
-// load the ical adapter
-var adapter = require('/src/adapters/icalfeed.js');
 
 // use the ical library to grab some raw ical data
 ical.fromURL(someUrl, {}, function(err, data) {
 
-    // load the raw ical data into icalstats
-    icalstats.load(data, adapter, startDate, endDate);
+    // load the raw ical data into calstats
+    calstats
+      .setStartDate('2015-12-01')
+      .setEndDate('2016-02-01')
+      .setRawData(data)
+      .run();
 
-    // icalstats is now ready to rock!
+    // calstats is now ready to rock!
 });
 ```
 
@@ -106,7 +117,7 @@ Once it's ready to rock, you can call the following functions:
     'radify': 1,
     'radify-labs': 1,
     'radify-labs-admin': 1,
-    'radify-labs-icalstats': 1,
+    'radify-labs-calstats': 1,
     'radify-labs-radiian': 1,
     'radify-labs-radiian-debugging': 1,
     'radify-labs-radiian-publishing': 1,
@@ -115,7 +126,7 @@ Once it's ready to rock, you can call the following functions:
 }
 ```
 
-icalstats.js can tell you things like:
+calstats.js can tell you things like:
 
 * 9 hours were spent on all Radify tasks
 * 3 hours were spent on all Radify labs radiian tasks
@@ -123,24 +134,22 @@ icalstats.js can tell you things like:
 * 2 hours was spent in total on Radify admin
 * 1 hour was spent in Radify admin meeting, and 1 hour in "radify-admin" (expressed as "other")
 
-This means that your client applications can support 'drilling down' into icalstats.js data sets.
+This means that your client applications can support 'drilling down' into calstats.js data sets.
 
 # Example usages
 
 ## Example API
 
-Here is a simple API that consumes the `icalstats.js` library. It uses:
+Here is a simple API that uses the `calstats.js` library to return statistics about a calendar. It uses:
 
 * [Hapi framework](http://hapijs.com/) - used for building an API
 * [ical library](https://www.npmjs.com/package/ical) - for loading and parsing ical feeds
-* icalstats.js - this library, used for producing statistics
+* calstats.js - this library, used for producing statistics
 
 ```javascript
 var Hapi = require('hapi');
-var icalstats = require('icalstats');
+var calstats = require('calstats');
 var ical = require('ical');
-// load the ical adapter
-var adapter = require('/src/adapters/icalfeed.js');
 
 var server = new Hapi.Server();
 server.connection({port: 4730, routes: {cors: true}});
@@ -153,16 +162,20 @@ server.route({
   path: '/',
   handler: function(request, reply) {
     ical.fromURL(request.payload.cal, {}, function(err, data) {
-      icalstats.load(data, adapter, request.payload.startDate, request.payload.endDate);
+      calstats
+        .setStartDate(request.payload.startDate)
+        .setEndDate(request.payload.endDate)
+        .setRawData(data)
+        .run();
 
       reply({
-        earliest: icalstats.getEarliest(),
-        latest: icalstats.getLatest(),
-        count: icalstats.getCount(),
-        total: icalstats.getTotalHours(),
-        breakdown: icalstats.getBreakdown(),
-        highLevelBreakdown: icalstats.getHighLevelBreakdown(),
-        tree: icalstats.getTree()
+        earliest: calstats.getEarliest(),
+        latest: calstats.getLatest(),
+        count: calstats.getCount(),
+        total: calstats.getTotalHours(),
+        breakdown: calstats.getBreakdown(),
+        highLevelBreakdown: calstats.getHighLevelBreakdown(),
+        tree: calstats.getTree()
       });
     });
   }
@@ -171,56 +184,48 @@ server.route({
 
 # Adapters
 
-icalstats.js comes bundled with adapters to parse:
-
-This library has adapters for:
+calstats.js comes bundled with adapters for:
 
 * [/src/adapters/googleapi.js](Google Calendar via oauth) - results from the [Google Calendar API events/list call](https://developers.google.com/google-apps/calendar/v3/reference/events/list)
-* [/src/adapters/icalfeed.js](ical formatted feed), as delivered by the [ical library](https://www.npmjs.com/package/ical) - an icalstats feed as loaded through the [ical library](https://www.npmjs.com/package/ical)
+* [/src/adapters/icalfeed.js](ical formatted feed), as delivered by the [ical library](https://www.npmjs.com/package/ical) - an ical feed as loaded through the [ical library](https://www.npmjs.com/package/ical). This is the default adapter.
 
 > Feel free to write your own adapter! See our [contributing guidelines](/CONTRIBUTING.md)
 
-To load an adapter, simply require it and tell icalstats.js to use that adapter:
+To load an adapter, tell calstats.js to use that adapter:
 
 ```javascript
-// load the Google calendar adapter
-var adapter = require('./src/adapters/googleapi');
 
-// ...
-
-// load the data into icalstats using the calendar adapter to normalise the data
-icalstats.load(data, adapter, '2016-01-01', '2016-12-30');
+// load the data into calstats using the google calendar adapter to normalise the raw data Google provides
+calstats
+  .setStartDate('2016-01-01')
+  .setEndDate('2016-02-01')
+  .setRawData(data)
+  .setAdapter(calstats.adapters.google)
+  .run();
 ```
 
 ```javascript
-// load the icalstats adapter
-var adapter = require('./src/adapters/icalfeed');
-
-// ...
-
-// load the data into icalstats using the calendar adapter to normalise the data
-icalstats.load(data, adapter, '2016-01-01', '2016-12-30');
-
-...
-
-// load the data into icalstats using the calendar adapter to normalise the data
-icalstats.load(data, adapter, '2016-01-01', '2016-12-30');
+calstats
+  .setStartDate('2016-01-01')
+  .setEndDate('2016-02-01')
+  .setRawData(data)
+  .setAdapter(calstats.adapters.ical)
+  .run();
 ```
 
 ## Example command line client
 
 * [Commander](https://www.npmjs.com/package/commander) - used for a nice CLI interface
 * [ical library](https://www.npmjs.com/package/ical) - for loading and parsing ical feeds
-* icalstats.js - this library, used for producing statistics
+* calstats.js - this library, used for producing statistics
 
 ```javascript
 var program = require('commander');
-var icalstats = require('icalstats');
+var calstats = require('calstats');
 var ical = require('ical');
-var adapter = require('./src/adapters/icalfeed');
 
 program
-  .version('0.0.3')
+  .version('0.0.4')
   .option('-i, --ical [url]', 'Private ical link from Google Calendar')
   .option('-s, --startDate [startDate]', 'The date to start from, e.g. 2015-05-01')
   .option('-e, --endDate [endDate]', 'The date to start from, e.g. 2015-05-08')
@@ -233,20 +238,24 @@ if (!process.argv.slice(2).length) {
 program.parse(process.argv);
 
 ical.fromURL(program.ical, {}, function(err, data) {
-  icalstats.load(data, adapter, program.startDate, program.endDate);
+  calstats
+    .setStartDate(program.startDate)
+    .setEndDate(program.endDate)
+    .setRawData(data)
+    .run();
 
-  console.log("Date range: " + icalstats.getEarliest() + " - " + icalstats.getLatest());
-  console.log("count: " + icalstats.getCount() + " events");
-  console.log("total: " + icalstats.getTotalHours() + " hours");
+  console.log("Date range: " + calstats.getEarliest() + " - " + calstats.getLatest());
+  console.log("count: " + calstats.getCount() + " events");
+  console.log("total: " + calstats.getTotalHours() + " hours");
 
   console.log("\nHigh level breakdown:");
-  console.log(icalstats.getHighLevelBreakdown());
+  console.log(calstats.getHighLevelBreakdown());
 
   console.log("\nDetailed breakdown:");
-  console.log(icalstats.getBreakdown());
+  console.log(calstats.getBreakdown());
 
   console.log("\nTree:");
-  console.log(icalstats.getTree());
+  console.log(calstats.getTree());
 });
 ```
 
@@ -264,8 +273,8 @@ Now build the project by running:
 gulp
 ```
 
-This will create `/icalstats.js`, which is the file that other projects should use, as specified in `package.json`.
+This will create `/build/calstats.js`, which is the file that other projects should use, as specified in `package.json`.
 
 Note the directory `spec` which contains the unit tests for this library.
 
-If you would like to submit code, feel free to create a pull request.
+If you would like to [submit code](CONTRIBUTING.md), feel free to create a pull request.

@@ -1,3 +1,4 @@
 node_modules
 testharness-*
 client_secret.json
+npm-debug.log

@@ -2,6 +2,7 @@
   'use strict';
   var _ = require('lodash');
 
+
   function extractTags(event) {
     var summary = event.summary.replace(/ /g, '_');
     if (!summary || summary === '') {
@@ -30,26 +31,126 @@
     return event.end && event.start;
   }
 
+  var adapters = {
+    google: require('./adapters/google'),
+    ical: require('./adapters/ical')
+  };
+
   module.exports = {
+
+    adapters: adapters,
+
+    input: {
+      rawData: null,
+      startDate: null,
+      endDate: null
+    },
 
     data: null,
     breakdown: null,
 
+    adapter: adapters.ical,
+
     /**
-     * Take a set of calendar data, and parse some statistics from it
+     * Set the raw data to be analysed
+     * @param {object} data Raw data to be analysed
+     * @return {object} this
+     */
+    setRawData: function(data) {
+      this.input.rawData = data;
+      return this;
+    },
+
+    /**
+     * @param {string} startDate Start of the date range you're interested in e.g. 2015-01-01
+     * @return {object} this
+     */
+    setStartDate: function(startDate) {
+      this.input.startDate = startDate;
+      return this;
+    },
+
+    /**
+     * @param {string} endDate End of the date range you're interested in e.g. 2015-01-08
+     * @return {object} this
+     */
+    setEndDate: function(endDate) {
+      this.input.endDate = endDate;
+      return this;
+    },
+
+    /**
+     * @param {object} adapter Either a built in one like calstats.adapters.ical or your own adapter matching that
+     * interface. Defaults to ical
+     * @return {object} this
+     */
+    setAdapter: function(adapter) {
+      this.adapter = adapter;
+      return this;
+    },
+
+    /**
+     * Take a set of calendar data, and parse some statistics from it, using the `ical` adapter
+     *
+     * Legacy method - the "new way" is to use the fluent interface:
+     *
+     *     calstats.setStartDate('2016-01-01')
+     *             .setEndDate('2016-02-01')
+     *             .setRawData(someData)
+     *             .setAdapter(calstats.adapters.ical)
+     *             .run();
+     *
+     * Calls `this.run();` once everything is set up
      *
      * @param {object} data ical data from the ical library
-     * @param {object} adapter
      * @param {datetime} startDate string e.g. 2015-01-01
      * @param {datetime} string e.g. 2015-10-01
      */
-    load: function(data, adapter, startDate, endDate) {
-      data = adapter.transform(data);
+    load: function(data, startDate, endDate) {
+      this.setRawData(data);
+      this.setStartDate(startDate);
+      this.setEndDate(endDate);
+      this.setAdapter(this.adapters.ical); // default adapter is ical for historical reasons
 
-      var filterStartDate = new Date(startDate);
-      var tmp = new Date(endDate);
-      var filterEndDate = new Date(endDate);
-      filterEndDate.setDate(tmp.getDate() + 1);
+      this.run();
+    },
+
+    validate: function() {
+      if(!this.input.startDate) {
+        throw 'Please set the start date - e.g. calstats.setStartDate("2016-01-01")';
+      }
+
+      if(!this.input.endDate) {
+        throw 'Please set the end date - e.g. calstats.setStartDate("2016-01-06")';
+      }
+
+      if(!this.input.rawData) {
+        throw 'Please set the raw data - e.g. calstats.setRawData(data)';
+      }
+    },
+
+    /**
+     * Load the data from this.rawData and transform it using the selected adapter
+     *
+     * @example
+     *
+     *     calstats.setStartDate('2016-01-01')
+     *             .setEndDate('2016-02-01')
+     *             .setRawData(someData)
+     *             .setAdapter(calstats.adapters.ical)
+     *             .run();
+     *
+     *     console.log(calstats.getTree()); // Tree view of the transformed data
+     */
+    run: function() {
+
+      this.validate();
+
+      var data = this.adapter.transform(this.input.rawData);
+
+      var filterStartDate = new Date(this.input.startDate);
+      var filterEndDate = new Date(this.input.endDate);
+      filterEndDate.setDate(filterEndDate.getDate() + 1);
       var totals = {};
 
       if (filterStartDate > filterEndDate) {
@@ -116,7 +217,7 @@
      * 'radify': 1,
      * 'radify-labs': 1,
      * 'radify-labs-admin': 1,
-     * 'radify-labs-icalstats': 1,
+     * 'radify-labs-calstats': 1,
      * 'radify-labs-radiian': 1,
      * 'radify-labs-radiian-debugging': 1,
      * 'radify-labs-radiian-publishing': 1,
@@ -131,7 +232,7 @@
      *       labs:
      *       { value: 6,
      *         admin: [Object],
-     *         icalstats: [Object],
+     *         calstats: [Object],
      *         radiian: [Object] },
      *       admin: { value: 2, meeting: [Object] } } }
      *

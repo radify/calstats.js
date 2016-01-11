@@ -5,15 +5,13 @@ var istanbul = require('gulp-istanbul');
 var jasmine = require('gulp-jasmine');
 var uglify = require('gulp-uglify');
 
-// This is a synchronous task - it has a callback on completion. This prevents
-// any dependant tasks from running until clean is good and finished.
-gulp.task('clean', function(cb) {
-  del(['build/*'], cb);
+gulp.task('clean', function() {
+  return del(['build/*']);
 });
 
 // Check that the code is up to code
 gulp.task('lint', function() {
-  return gulp.src('src/**/*.js')
+  return gulp.src(['src/**/*.js', 'spec/**/*.js'])
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
     .pipe(jshint.reporter('fail'));
@@ -45,14 +43,14 @@ gulp.task('quality', ['test', 'lint']);
 
 // The build task - relies on 'clean' and 'quality' and 'styles
 gulp.task('build', ['clean', 'quality'], function() {
-  gulp.src('src/icalstats.js')
+  return gulp.src('src/**/*.js')
     .pipe(uglify())
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build/'));
 });
 
 // On change to JavaScript files, run the default task
 gulp.task('dev', ['default'], function() {
-  gulp.watch(['spec/*.js', 'src/**/*.js'], ['default']);
+  gulp.watch(['spec/*.js', 'src/**/*.js', 'fixtures/**/*'], ['default']);
 });
 
 // alias watch == dev
