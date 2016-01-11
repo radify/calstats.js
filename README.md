@@ -5,7 +5,7 @@
 
 # calstats.js
 
-NodeJS tool that can generate statistics from a calendar by parsing [tags]. Provides:
+JavaScript tool that can generate statistics for calendars by parsing `[tags]`. Provides:
 
 * Amount of time spent on each client
 * Detailed breakdown of tasks within projects
